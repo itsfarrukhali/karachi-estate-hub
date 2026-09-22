@@ -6,8 +6,8 @@ import { properties, Property, getPropertyById } from "@/data/properties";
 export type CurrencyType = "PKR" | "USD" | "AED";
 export type AreaUnitType = "sqyd" | "sqft";
 
-// Conversion rates against PKR
-const RATES: Record<CurrencyType, number> = {
+// Default Conversion rates against PKR (used as fallback)
+const DEFAULT_RATES: Record<CurrencyType, number> = {
   PKR: 1,
   USD: 278.5,
   AED: 75.8,
@@ -18,6 +18,8 @@ interface PreferencesContextType {
   setCurrency: (c: CurrencyType) => void;
   areaUnit: AreaUnitType;
   setAreaUnit: (u: AreaUnitType) => void;
+  rates: Record<CurrencyType, number>;
+  ratesLastUpdated: string | null;
   savedIds: string[];
   toggleSave: (id: string) => void;
   isSaved: (id: string) => boolean;
@@ -40,17 +42,22 @@ const PreferencesContext = createContext<PreferencesContextType | undefined>(und
 export function PreferencesProvider({ children }: { children: ReactNode }) {
   const [currency, setCurrency] = useState<CurrencyType>("PKR");
   const [areaUnit, setAreaUnit] = useState<AreaUnitType>("sqyd");
+  const [rates, setRates] = useState<Record<CurrencyType, number>>(DEFAULT_RATES);
+  const [ratesLastUpdated, setRatesLastUpdated] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
-  // Load from localStorage if available
+  // Load from localStorage and fetch live currency rates
   useEffect(() => {
     try {
       const savedCur = localStorage.getItem("keh_currency") as CurrencyType;
       const savedUnit = localStorage.getItem("keh_unit") as AreaUnitType;
       const savedFavs = localStorage.getItem("keh_saved");
+      const cachedRates = localStorage.getItem("keh_rates");
+      const cachedTime = localStorage.getItem("keh_rates_time");
+
       if (savedCur && (savedCur === "PKR" || savedCur === "USD" || savedCur === "AED")) {
         setCurrency(savedCur);
       }
@@ -60,9 +67,59 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       if (savedFavs) {
         setSavedIds(JSON.parse(savedFavs));
       }
+      if (cachedRates) {
+        setRates(JSON.parse(cachedRates));
+      }
+      if (cachedTime) {
+        setRatesLastUpdated(cachedTime);
+      }
     } catch {
       // Ignore in SSR
     }
+
+    // Dynamic Exchange Rate Fetching with fallback
+    async function fetchLiveRates() {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch("https://open.er-api.com/v6/latest/USD", {
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.rates && data.rates.PKR) {
+            const pkrPerUsd = data.rates.PKR;
+            const aedPerUsd = data.rates.AED || 3.6725;
+            const pkrPerAed = pkrPerUsd / aedPerUsd;
+
+            const newRates: Record<CurrencyType, number> = {
+              PKR: 1,
+              USD: Number(pkrPerUsd.toFixed(2)),
+              AED: Number(pkrPerAed.toFixed(2)),
+            };
+
+            setRates(newRates);
+            const dateStr = new Date().toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            });
+            setRatesLastUpdated(dateStr);
+
+            try {
+              localStorage.setItem("keh_rates", JSON.stringify(newRates));
+              localStorage.setItem("keh_rates_time", dateStr);
+            } catch {}
+          }
+        }
+      } catch {
+        // Graceful fallback to default static rates
+      }
+    }
+
+    fetchLiveRates();
   }, []);
 
   function handleSetCurrency(c: CurrencyType) {
@@ -131,8 +188,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       return `PKR ${pkrAmount.toLocaleString()}`;
     }
 
-    // Foreign currency conversion
-    const rate = RATES[currency];
+    // Foreign currency conversion using dynamic or fallback rate
+    const rate = rates[currency] || DEFAULT_RATES[currency] || 1;
     const converted = pkrAmount / rate;
 
     if (currency === "USD") {
@@ -184,6 +241,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         setCurrency: handleSetCurrency,
         areaUnit,
         setAreaUnit: handleSetUnit,
+        rates,
+        ratesLastUpdated,
         savedIds,
         toggleSave,
         isSaved,

@@ -1774,18 +1774,172 @@ h1 i, h2 i, h3 i, h4 i { color: var(--orange); font-style: italic; font-weight: 
 }
 
 /* ============================================================
-   PRINT DOSSIER STYLES (Clean 2-Page Executive PDF / Print)
+   PRINT DOSSIER STYLES (Executive PDF / A4 Brochure Layout)
 ============================================================ */
 @media print {
-  body { background: white !important; color: #000 !important; }
-  .topbar, .nav, .action-buttons-row, .sticky-agent-card .agent-actions-stack, .inquiry-form-wrap, .similar-props-section, .footer, .compare-floating-bar, .share-btn-top, .print-dossier-btn, .schedule-btn-trigger, .lightbox-backdrop, .modal-backdrop, .drawer-backdrop {
+  @page {
+    size: A4 portrait;
+    margin: 1.2cm 1cm;
+  }
+
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #112c30 !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Hide interactive, floating and navigational elements */
+  .topbar,
+  .nav,
+  .action-buttons-row,
+  .agent-actions-stack,
+  .inquiry-form-wrap,
+  .similar-props-section,
+  .footer,
+  .compare-floating-bar,
+  .share-btn-top,
+  .print-dossier-btn,
+  .schedule-btn-trigger,
+  .lightbox-backdrop,
+  .modal-backdrop,
+  .drawer-backdrop,
+  .calc-range,
+  .calc-apply-btn,
+  .mosaic-expand-hint,
+  .more-photos-overlay,
+  .breadcrumbs,
+  .btn-whatsapp,
+  .btn-view-details,
+  .prop-card-actions-top-right,
+  .slider-arrow,
+  .prop-card-dots {
     display: none !important;
   }
-  .container { width: 100% !important; margin: 0 !important; }
-  .prop-body-layout { display: block !important; }
-  .prop-left-col { width: 100% !important; }
-  .specs-card, .content-box, .sticky-agent-card { border: 1px solid #ccc !important; box-shadow: none !important; page-break-inside: avoid; }
-  .mosaic-grid { grid-template-columns: repeat(3, 1fr) !important; grid-template-rows: 150px !important; }
-  .mosaic-lead { grid-row: span 1 !important; }
-  .prop-title { font-size: 28pt !important; }
+
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Property Header */
+  .prop-header-section {
+    border-bottom: 2px solid #0e494c;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+  }
+
+  .prop-main-heading-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+  }
+
+  .prop-title {
+    font-size: 22pt !important;
+    color: #072a2c !important;
+    margin: 6px 0 !important;
+  }
+
+  .price-val {
+    font-size: 20pt !important;
+    color: #e36b3c !important;
+    font-weight: 700 !important;
+  }
+
+  /* Photo Mosaic in Print */
+  .mosaic-grid {
+    display: grid !important;
+    grid-template-columns: 2fr 1fr 1fr !important;
+    grid-template-rows: 160px !important;
+    gap: 8px !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid;
+  }
+
+  .mosaic-item {
+    border-radius: 4px !important;
+    border: 1px solid #dce3df !important;
+    background-size: cover !important;
+    background-position: center !important;
+  }
+
+  /* Main Body Layout */
+  .prop-body-layout {
+    display: grid !important;
+    grid-template-columns: 2fr 1fr !important;
+    gap: 20px !important;
+  }
+
+  .specs-card {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+    background: #f6f4ef !important;
+    border: 1px solid #dce3df !important;
+    padding: 12px !important;
+    margin-bottom: 16px !important;
+    page-break-inside: avoid;
+  }
+
+  .content-box {
+    background: #ffffff !important;
+    border: 1px solid #e2e8e5 !important;
+    padding: 14px !important;
+    margin-bottom: 14px !important;
+    page-break-inside: avoid;
+  }
+
+  .content-box h2 {
+    font-size: 14pt !important;
+    margin-bottom: 8px !important;
+  }
+
+  .features-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+  }
+
+  .calculator-box {
+    page-break-inside: avoid;
+  }
+
+  .calc-result-panel {
+    background: #f8faf9 !important;
+    border: 1px solid #dce3df !important;
+    padding: 12px !important;
+  }
+
+  /* Agent Contact Box */
+  .sticky-agent-card {
+    position: static !important;
+    border: 1px solid #0e494c !important;
+    background: #fdfdfd !important;
+    padding: 14px !important;
+    page-break-inside: avoid;
+  }
+
+  .agent-profile-header {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+
+  .agent-name {
+    font-size: 13pt !important;
+    color: #072a2c !important;
+  }
+
+  .assurance-box {
+    margin-top: 10px;
+    font-size: 9pt !important;
+  }
 }

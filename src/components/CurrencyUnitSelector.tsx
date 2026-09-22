@@ -3,7 +3,7 @@
 import { usePreferences, CurrencyType, AreaUnitType } from "@/context/PreferencesContext";
 
 export function CurrencyUnitSelector() {
-  const { currency, setCurrency, areaUnit, setAreaUnit } = usePreferences();
+  const { currency, setCurrency, areaUnit, setAreaUnit, rates } = usePreferences();
 
   return (
     <div className="pref-selector-bar">
@@ -15,6 +15,11 @@ export function CurrencyUnitSelector() {
             type="button"
             className={`pref-btn ${currency === cur ? "active" : ""}`}
             onClick={() => setCurrency(cur)}
+            title={
+              cur !== "PKR"
+                ? `1 ${cur} = ~PKR ${rates[cur]} (Live conversion)`
+                : "Base Currency: Pakistani Rupee"
+            }
           >
             {cur}
           </button>
