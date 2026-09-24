@@ -6,37 +6,36 @@ import { useRouter } from "next/navigation";
 import { properties } from "@/data/properties";
 import { PropertyCard } from "@/components/PropertyCard";
 import { CurrencyUnitSelector } from "@/components/CurrencyUnitSelector";
-import { KarachiAreaIntel } from "@/components/KarachiAreaIntel";
 import { usePreferences } from "@/context/PreferencesContext";
 
 const neighborhoods = [
   {
-    name: "DHA Karachi",
-    count: "1,240 properties",
-    slug: "DHA",
-    image:
-      "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=800&q=85",
-  },
-  {
-    name: "Clifton",
-    count: "486 properties",
-    slug: "Clifton",
-    image:
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=85",
-  },
-  {
-    name: "Bahria Town",
-    count: "892 properties",
-    slug: "Bahria Town",
-    image:
-      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=800&q=85",
-  },
-  {
     name: "Gulshan-e-Iqbal",
-    count: "328 properties",
+    count: "Houses & Apartments",
     slug: "Gulshan",
     image:
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=85",
+  },
+  {
+    name: "DHA Karachi",
+    count: "Luxury Villas & Plots",
+    slug: "DHA",
+    image:
+      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=85",
+  },
+  {
+    name: "Gulistan-e-Jauhar",
+    count: "Portions & Family Homes",
+    slug: "Jauhar",
+    image:
       "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=85",
+  },
+  {
+    name: "North Nazimabad",
+    count: "Prime Residential Houses",
+    slug: "North Nazimabad",
+    image:
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=85",
   },
 ];
 
@@ -57,8 +56,8 @@ export default function Home() {
   const router = useRouter();
   const { savedIds, setIsDrawerOpen } = usePreferences();
   const [searchType, setSearchType] = useState<"Buy" | "Rent" | "All">("Buy");
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
+  const [propertyType, setPropertyType] = useState("all");
+  const [region, setRegion] = useState("all");
   const [location, setLocation] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -67,18 +66,25 @@ export default function Home() {
     const purposeParam = searchType === "Buy" ? "buy" : searchType === "Rent" ? "rent" : "all";
     const query = new URLSearchParams();
     if (purposeParam !== "all") query.set("purpose", purposeParam);
-    if (location.trim()) query.set("area", location.trim());
+    if (location.trim()) {
+      query.set("area", location.trim());
+    } else if (region !== "all") {
+      query.set("area", region);
+    }
+    if (propertyType !== "all") {
+      query.set("type", propertyType);
+    }
     router.push(`/properties?${query.toString()}`);
   }
 
-  const featuredListings = properties.slice(0, 3);
+  const featuredListings = properties.slice(0, 6);
 
   return (
     <main>
-      {/* Top Banner with Currency/Unit Switcher */}
+      {/* Top Banner with Currency/Unit Switcher & Agency Demo Notice */}
       <div className="topbar">
         <div className="container topbar-inner">
-          <span>Pakistan&apos;s trusted property partner</span>
+          <span>✨ Built for Real Estate Businesses · Ready to Customize</span>
           <div className="topbar-right-wrap">
             <CurrencyUnitSelector />
             <span className="topbar-right">Karachi, PK</span>
@@ -95,10 +101,9 @@ export default function Home() {
         <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
           <Link href="/properties?purpose=buy">Buy</Link>
           <Link href="/properties?purpose=rent">Rent</Link>
-          <Link href="/properties">All Properties</Link>
-          <a href="#neighborhoods">Explore Areas</a>
-          <a href="#area-intel">Area Intel</a>
-          <Link href="/list-property">Valuation</Link>
+          <Link href="/properties">All Listings</Link>
+          <Link href="/list-property">Sell / Rent With Us</Link>
+          <a href="#for-agencies" className="nav-highlight-link">For Agencies</a>
         </nav>
         <div className="nav-actions">
           <button
@@ -107,10 +112,10 @@ export default function Home() {
             onClick={() => setIsDrawerOpen(true)}
             title="Open saved shortlist"
           >
-            ♡ Saved <small>{savedIds.length}</small>
+            ♡ Shortlist <small>{savedIds.length}</small>
           </button>
           <Link href="/list-property" className="outline-button">
-            List your property
+            Submit Property
           </Link>
           <button
             type="button"
@@ -128,34 +133,28 @@ export default function Home() {
       <section className="hero container">
         <div className="hero-copy">
           <p className="eyebrow">
-            <span className="eyebrow-line" /> FIND YOUR PLACE
+            <span className="eyebrow-line" /> BUILT FOR KARACHI PROPERTY BUSINESSES
           </p>
           <h1>
-            Space to live<br />
-            <i>your way.</i>
+            Your Properties.<br />
+            <i>Your Brand.</i>
           </h1>
           <p className="hero-description">
-            The considered way to find a home in Karachi. Browse verified properties,
-            understand the market, and move with confidence.
+            The modern way to showcase Karachi properties. Give your clients a clean, verified browsing experience with instant 1-click WhatsApp inquiries.
           </p>
           <div className="hero-actions">
             <Link href="/properties" className="primary-button">
-              Explore properties <ArrowUpRight />
+              Explore Properties <ArrowUpRight />
             </Link>
-            <a href="#how-it-works" className="text-link">
-              How it works <span>↓</span>
+            <a href="#for-agencies" className="text-link">
+              Get this website for your agency <span>↓</span>
             </a>
           </div>
           <div className="hero-proof">
-            <div className="avatar-stack">
-              <span>AR</span>
-              <span>MK</span>
-              <span>SA</span>
-              <b>+</b>
-            </div>
-            <div>
-              <strong>4.9 / 5</strong>
-              <span>from 2,000+ happy clients</span>
+            <div className="hero-capability-pills">
+              <span className="cap-pill">🏡 Houses &amp; Flats</span>
+              <span className="cap-pill">📐 Plots &amp; Commercial</span>
+              <span className="cap-pill">💬 Direct WhatsApp Leads</span>
             </div>
           </div>
         </div>
@@ -165,15 +164,15 @@ export default function Home() {
           <div className="hero-photo-label">
             <span>01</span>
             <div>
-              <strong>Thoughtfully<br />found homes</strong>
-              <small>Karachi, Pakistan</small>
+              <strong>Verified Karachi<br />Properties</strong>
+              <small>Houses, Flats &amp; Plots</small>
             </div>
           </div>
           <div className="hero-note">
-            <span className="note-icon">✦</span>
+            <span className="note-icon">💬</span>
             <span>
-              <strong>15 years</strong><br />
-              of local expertise
+              <strong>Direct Leads</strong><br />
+              Straight to your WhatsApp
             </span>
           </div>
         </div>
@@ -198,57 +197,83 @@ export default function Home() {
             <span className="search-icon">
               <SearchIcon />
             </span>
-            <label htmlFor="location">Location or keyword</label>
+            <label htmlFor="location">Area or keyword</label>
             <input
               id="location"
               value={location}
               onChange={(event) => setLocation(event.target.value)}
-              placeholder="e.g. DHA Phase 6, Clifton, Bahria Town..."
+              placeholder="e.g. Gulshan, DHA, Jauhar, Scheme 33..."
             />
           </div>
           <div className="search-field">
-            <label>Property type</label>
-            <strong>All residential types <span>⌄</span></strong>
+            <label htmlFor="search-prop-type">Property type</label>
+            <select
+              id="search-prop-type"
+              value={propertyType}
+              onChange={(e) => setPropertyType(e.target.value)}
+              aria-label="Filter property type"
+            >
+              <option value="all">All Types (Houses, Flats, Plots, Shops)</option>
+              <option value="house">Houses &amp; Portions</option>
+              <option value="apartment">Apartments &amp; Flats</option>
+              <option value="villa">Villas &amp; Bungalows</option>
+              <option value="plot">Residential Plots</option>
+              <option value="commercial">Commercial &amp; Shops</option>
+            </select>
           </div>
           <div className="search-field">
-            <label>City region</label>
-            <strong>Karachi South &amp; East <span>⌄</span></strong>
+            <label htmlFor="search-region">City region</label>
+            <select
+              id="search-region"
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
+              aria-label="Filter city region"
+            >
+              <option value="all">All Karachi Sectors</option>
+              <option value="Gulshan">Gulshan-e-Iqbal</option>
+              <option value="DHA">DHA Karachi</option>
+              <option value="Jauhar">Gulistan-e-Jauhar</option>
+              <option value="North Nazimabad">North Nazimabad</option>
+              <option value="Scheme 33">Scheme 33</option>
+              <option value="PECHS">PECHS</option>
+              <option value="Clifton">Clifton</option>
+              <option value="Bahria Town">Bahria Town</option>
+              <option value="Federal B Area">Federal B Area</option>
+            </select>
           </div>
           <button className="search-button" type="submit">
             <SearchIcon /> Search
           </button>
         </form>
         <div className="search-trending">
-          <span>Popular searches</span>
-          <Link href="/properties?area=DHA%20Phase%206">DHA Phase 6</Link>
-          <Link href="/properties?area=Clifton">Clifton Block 8</Link>
-          <Link href="/properties?area=Bahria%20Town">Bahria Town</Link>
-          <Link href="/properties?purpose=buy">Villas for Sale</Link>
-          <Link href="/properties?purpose=rent">Sea View Rentals</Link>
+          <span>Popular searches:</span>
+          <Link href="/properties?area=Gulshan">Gulshan-e-Iqbal</Link>
+          <Link href="/properties?area=DHA">DHA Phase 6</Link>
+          <Link href="/properties?area=Jauhar">Gulistan-e-Jauhar</Link>
+          <Link href="/properties?area=North%20Nazimabad">North Nazimabad</Link>
+          <Link href="/properties?area=Scheme%2033">Scheme 33 Plots</Link>
+          <Link href="/properties?area=PECHS">PECHS Commercial</Link>
         </div>
       </section>
 
-      {/* Trust Strip */}
+      {/* Honest Agency Value Strip (No Fake Numbers) */}
       <section className="trust-strip">
         <div className="container trust-inner">
-          <span>Trusted by people who care about where they live</span>
+          <span>Built for Karachi Property Businesses</span>
           <div className="trust-stats">
             <div>
-              <strong>18k<span>+</span></strong>
-              <small>verified listings</small>
+              <strong>Property Listings</strong>
+              <small>Houses, Flats, Plots &amp; Commercial</small>
             </div>
             <div>
-              <strong>12<span>k</span></strong>
-              <small>families placed</small>
+              <strong>Buy &amp; Rent Ready</strong>
+              <small>Filterable search with specs</small>
             </div>
             <div>
-              <strong>4.9<span>/5</span></strong>
-              <small>client rating</small>
+              <strong>WhatsApp Inquiries</strong>
+              <small>Direct pre-filled lead capture</small>
             </div>
           </div>
-          <span className="as-seen">
-            As seen in <b>DAWN</b> <b>Business<br />Recorder</b>
-          </span>
         </div>
       </section>
 
@@ -257,12 +282,12 @@ export default function Home() {
         <div className="section-heading">
           <div>
             <p className="eyebrow">
-              <span className="eyebrow-line" /> CURATED FOR YOU
+              <span className="eyebrow-line" /> CURRENT LISTINGS
             </p>
-            <h2>Homes worth <i>coming home to.</i></h2>
+            <h2>Featured Karachi <i>Properties.</i></h2>
           </div>
           <Link href="/properties" className="text-link">
-            View all properties <ArrowUpRight />
+            View all properties ({properties.length}) <ArrowUpRight />
           </Link>
         </div>
 
@@ -273,24 +298,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Karachi Locality Intel Component */}
-      <div id="area-intel">
-        <KarachiAreaIntel />
-      </div>
-
       {/* Neighborhoods Showcase */}
       <section id="neighborhoods" className="section neighborhood-section">
         <div className="container">
           <div className="section-heading">
             <div>
               <p className="eyebrow">
-                <span className="eyebrow-line" /> KNOW THE NEIGHBOURHOOD
+                <span className="eyebrow-line" /> COVERED LOCATIONS
               </p>
-              <h2>Find your kind<br />of <i>Karachi.</i></h2>
+              <h2>Properties Across<br /><i>Karachi.</i></h2>
             </div>
             <p className="heading-note">
-              Every neighbourhood has a rhythm.<br />
-              Let&apos;s find the one that fits yours.
+              Showcase listings across any sector or neighborhood in the city.
             </p>
           </div>
           <div className="neighborhood-grid">
@@ -316,110 +335,63 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="services" className="section services container">
-        <div className="services-intro">
-          <p className="eyebrow">
-            <span className="eyebrow-line" /> MORE THAN A LISTING
+      {/* Dedicated "For Agencies" Sales & Conversion Section */}
+      <section id="for-agencies" className="section for-agencies-section container">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">
+              <span className="eyebrow-line" /> FOR REAL ESTATE AGENCIES
+            </p>
+            <h2>Your Properties. Your Brand.<br /><i>Your Leads.</i></h2>
+          </div>
+          <p className="heading-note">
+            Give your customers one professional place to discover your properties and contact your team directly.
           </p>
-          <h2>A better way<br />to <i>move.</i></h2>
-          <p>
-            From first search to final signature, our people and partners are here to make property feel personal again.
-          </p>
-          <Link href="/list-property" className="text-link">
-            See how we help <ArrowUpRight />
-          </Link>
         </div>
-        <div className="service-list">
-          <Link href="/properties?purpose=buy">
-            <span className="service-icon">⌂</span>
-            <div>
-              <h3>Buy with confidence</h3>
-              <p>Local insight, verified documents, and a dedicated property advisor.</p>
-            </div>
-            <ArrowUpRight />
-          </Link>
-          <Link href="/list-property">
-            <span className="service-icon">↗</span>
-            <div>
-              <h3>Sell for what it&apos;s worth</h3>
-              <p>Instant market valuation calculator and discreet qualified marketing.</p>
-            </div>
-            <ArrowUpRight />
-          </Link>
-          <Link href="/properties?purpose=rent">
-            <span className="service-icon">✦</span>
-            <div>
-              <h3>Premium Rental Advisory</h3>
-              <p>Fully vetted executive tenants, transparent leases, and move-in coordination.</p>
-            </div>
-            <ArrowUpRight />
-          </Link>
-        </div>
-      </section>
 
-      {/* Testimonials */}
-      <section id="how-it-works" className="quote-section">
-        <div className="container quote-inner">
-          <span className="quote-mark">“</span>
-          <blockquote>
-            They didn&apos;t just find us a house. They found us the place where our next chapter feels possible.
-          </blockquote>
-          <div className="quote-author">
-            <span className="author-avatar">HS</span>
-            <div>
-              <strong>Hira &amp; Saad</strong>
-              <span>Moved to DHA Phase 6 in 2024</span>
-            </div>
+        <div className="agency-cards-grid">
+          <div className="agency-card">
+            <span className="agency-card-icon">🏛️</span>
+            <h3>Showcase Properties</h3>
+            <p>
+              Display houses, apartments, plots, and commercial properties with photos, specs, pricing, and key features.
+            </p>
           </div>
-          <div className="quote-controls">
-            <button aria-label="Previous testimonial" type="button">←</button>
-            <span>01 <i /> 03</span>
-            <button aria-label="Next testimonial" type="button">→</button>
+          <div className="agency-card highlight">
+            <span className="agency-card-icon">💬</span>
+            <h3>Generate WhatsApp Leads</h3>
+            <p>
+              Let potential buyers and tenants contact your advisors directly with 1-click pre-filled inquiry messages.
+            </p>
+          </div>
+          <div className="agency-card">
+            <span className="agency-card-icon">✨</span>
+            <h3>Build Your Brand</h3>
+            <p>
+              Customized with your agency name, logo, brand colors, advisor contact details, and your custom domain name.
+            </p>
           </div>
         </div>
-      </section>
 
-      {/* Newsletter */}
-      <section id="contact" className="newsletter container">
-        <div>
-          <p className="eyebrow">
-            <span className="eyebrow-line" /> THE WEEKLY EDIT
-          </p>
-          <h2>Good properties.<br /><i>Good ideas.</i></h2>
-          <p>
-            Get a considered shortlist of new homes, local stories and market notes in your inbox.
-          </p>
-        </div>
-        {subscribed ? (
-          <div className="subscribe-success">
-            You&apos;re on the list. See you in your inbox.
+        <div className="agency-cta-box">
+          <div className="agency-cta-text">
+            <h3>Want a website like this for your real estate business?</h3>
+            <p>
+              We can customize this entire website with your agency&apos;s branding, listings, contact details, and WhatsApp numbers.
+            </p>
           </div>
-        ) : (
-          <form
-            className="subscribe-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (email) setSubscribed(true);
-            }}
+          <a
+            href="https://wa.me/923008214590?text=Assalam%20o%20Alaikum%2C%20I%20saw%20your%20Karachi%20Real%20Estate%20website%20demo%20and%20want%20a%20similar%20website%20for%20my%20agency."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="agency-wa-btn"
           >
-            <label htmlFor="email">Your email address</label>
-            <div>
-              <input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <button type="submit" aria-label="Subscribe">
-                <ArrowUpRight />
-              </button>
-            </div>
-            <small>No noise. Just the good stuff. Unsubscribe anytime.</small>
-          </form>
-        )}
+            <svg viewBox="0 0 24 24" className="wa-icon-large" aria-hidden="true">
+              <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.95.57 3.86 1.64 5.51L2 22l4.74-1.72a9.87 9.87 0 0 0 5.3 1.52h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm5.79 14.28c-.24.68-1.39 1.33-1.92 1.38-.5.06-1.12.08-3.6-1.03-3.17-1.42-5.18-4.73-5.34-4.95-.16-.22-1.28-1.7-1.28-3.24 0-1.54.81-2.3 1.1-2.61.29-.31.63-.39.84-.39.21 0 .42 0 .61.01.2.01.46-.07.72.55.27.65.92 2.25.99 2.42.08.17.13.37.03.59-.11.22-.16.35-.32.54-.16.19-.34.42-.49.57-.16.16-.33.34-.14.67.19.33.85 1.4 1.82 2.26 1.25 1.11 2.3 1.46 2.63 1.62.33.16.52.14.72-.09.2-.23.84-.98 1.07-1.31.22-.33.45-.28.75-.17.31.11 1.96.93 2.3 1.1.33.16.55.24.63.38.08.14.08.8-.16 1.48z" />
+            </svg>
+            <span>WhatsApp Us For Your Website</span>
+          </a>
+        </div>
       </section>
 
       {/* Footer */}
@@ -431,47 +403,36 @@ export default function Home() {
               <span>karachi<span>estate</span></span>
             </Link>
             <p>
-              Property with a point of view.<br />
-              Made for Karachi.
+              Professional Real Estate Website Solution.<br />
+              Built for Karachi Agencies.
             </p>
-            <div className="socials">
-              <a href="#instagram">ig</a>
-              <a href="#facebook">f</a>
-              <a href="#linkedin">in</a>
-            </div>
           </div>
           <div>
-            <h4>Explore</h4>
+            <h4>Properties</h4>
             <Link href="/properties?purpose=buy">Buy a property</Link>
             <Link href="/properties?purpose=rent">Rent a property</Link>
-            <Link href="/properties">All Neighbourhoods</Link>
-            <Link href="/list-property">List your property</Link>
+            <Link href="/properties">All Listings</Link>
+            <Link href="/list-property">Sell Your Property</Link>
           </div>
           <div>
-            <h4>Company</h4>
-            <a href="#about">About us</a>
-            <a href="#services">Our services</a>
-            <a href="#contact">Journal</a>
-            <a href="#contact">Contact</a>
+            <h4>Agency Solutions</h4>
+            <a href="#for-agencies">Get This Website</a>
+            <a href="#for-agencies">WhatsApp Integration</a>
+            <a href="#for-agencies">Custom Branding</a>
           </div>
           <div>
             <h4>Get in touch</h4>
-            <a href="tel:+9221111222333">021 111 222 333</a>
-            <a href="mailto:hello@karachiestate.pk">hello@karachiestate.pk</a>
+            <a href="tel:+923008214590">+92 300 8214590</a>
+            <a href="mailto:contact@karachiestate.pk">contact@karachiestate.pk</a>
             <p className="footer-address">
-              Clifton, Karachi<br />
-              Mon–Sat, 9am–6pm
+              Karachi, Pakistan<br />
+              Mon–Sat, 9am–7pm
             </p>
           </div>
         </div>
         <div className="container footer-bottom">
-          <span>© 2025 Karachi Estate. All rights reserved.</span>
-          <span>
-            <a href="#privacy">Privacy</a>
-            <a href="#terms">Terms</a>
-            <a href="#sitemap">Sitemap</a>
-          </span>
-          <span>Made with care in Karachi <b>♥</b></span>
+          <span>© 2025 Karachi Estate. Ready for Real Estate Agency Customization.</span>
+          <span>Made with care for Karachi Businesses <b>♥</b></span>
         </div>
       </footer>
     </main>

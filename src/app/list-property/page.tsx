@@ -2,77 +2,44 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePreferences } from "@/context/PreferencesContext";
 import { CurrencyUnitSelector } from "@/components/CurrencyUnitSelector";
 
-interface ValuationModel {
-  locality: string;
-  type: string;
-  size: number;
-  condition: string;
-}
-
 export default function ListPropertyPage() {
-  const { formatPrice, currency } = usePreferences();
-  const [sent, setSent] = useState(false);
-
-  // Valuation Estimator State
-  const [valLocality, setValLocality] = useState("dha6");
-  const [valType, setValType] = useState("villa");
-  const [valSize, setValSize] = useState(500);
-  const [valCondition, setValCondition] = useState("new");
-
-  // Form State
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [locationStr, setLocationStr] = useState("DHA Phase 6, Karachi");
-  const [intent, setIntent] = useState("sell");
+  const [purpose, setPurpose] = useState<"Sell" | "Rent">("Sell");
+  const [propertyType, setPropertyType] = useState("House");
+  const [areaLocation, setAreaLocation] = useState("Gulshan-e-Iqbal");
+  const [sizeDetails, setSizeDetails] = useState("");
+  const [demandPrice, setDemandPrice] = useState("");
+  const [notes, setNotes] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-  // Base rate per sq. yard in PKR
-  const baseRates: Record<string, number> = {
-    dha5: 190000,
-    dha6: 180000,
-    dha8: 220000,
-    clifton2: 240000,
-    clifton8: 280000,
-    bahria: 85000,
-    gulshan: 95000,
-  };
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name || !phone) return;
 
-  const typeMultipliers: Record<string, number> = {
-    villa: 1.25,
-    house: 1.15,
-    apartment: 1.0,
-    plot: 0.85,
-  };
+    const messageText = `Assalam o Alaikum, I would like to list my property with your agency:
 
-  const conditionMultipliers: Record<string, number> = {
-    new: 1.15,
-    mid: 1.0,
-    older: 0.85,
-  };
+*Owner Name:* ${name}
+*WhatsApp:* ${phone}
+*Purpose:* For ${purpose}
+*Property Type:* ${propertyType}
+*Location:* ${areaLocation}
+*Size / Specs:* ${sizeDetails || "Not specified"}
+*Demand / Price:* ${demandPrice || "Negotiable"}
+${notes ? `*Additional Notes:* ${notes}` : ""}
 
-  const baseRate = baseRates[valLocality] || 150000;
-  const typeMult = typeMultipliers[valType] || 1.0;
-  const condMult = conditionMultipliers[valCondition] || 1.0;
+Please connect me with a property advisor. Thank you!`;
 
-  const estimatedValue = Math.round(valSize * baseRate * typeMult * condMult);
-  const lowBracket = Math.round(estimatedValue * 0.94);
-  const highBracket = Math.round(estimatedValue * 1.06);
-  const estMonthlyRent = Math.round(estimatedValue * 0.0042);
+    const waUrl = `https://wa.me/923008214590?text=${encodeURIComponent(messageText)}`;
 
-  function handleValuationPrefill() {
-    const localityNames: Record<string, string> = {
-      dha5: "DHA Phase 5",
-      dha6: "DHA Phase 6",
-      dha8: "DHA Phase 8",
-      clifton2: "Clifton Block 2",
-      clifton8: "Clifton Block 8",
-      bahria: "Bahria Town Karachi",
-      gulshan: "Gulshan-e-Iqbal",
-    };
-    setLocationStr(`${valSize} sq. yd ${valType} in ${localityNames[valLocality] || "Karachi"}`);
-    document.getElementById("seller-form")?.scrollIntoView({ behavior: "smooth" });
+    // Open WhatsApp in new tab
+    if (typeof window !== "undefined") {
+      window.open(waUrl, "_blank");
+    }
+
+    setSubmitted(true);
   }
 
   return (
@@ -80,7 +47,7 @@ export default function ListPropertyPage() {
       {/* Topbar */}
       <div className="topbar">
         <div className="container topbar-inner">
-          <span>Pakistan&apos;s trusted property partner</span>
+          <span>✨ Real Estate Agency Solutions · Karachi, PK</span>
           <div className="topbar-right-wrap">
             <CurrencyUnitSelector />
             <span className="topbar-right">Karachi, PK</span>
@@ -98,198 +65,136 @@ export default function ListPropertyPage() {
         </Link>
       </header>
 
-      {/* Hero Section */}
-      <section className="container valuation-hero-section">
-        <span className="eyebrow">
-          <span className="eyebrow-line" /> SELLER &amp; LANDLORD ADVISORY
-        </span>
-        <h1>
-          Know what your Karachi property<br />
-          <i>is truly worth today.</i>
-        </h1>
-        <p className="hero-subtext">
-          Use our intelligent Karachi market valuation model to calculate realistic sale brackets or request an in-person advisory appraisal.
-        </p>
-      </section>
-
-      {/* Interactive Valuation Tool */}
-      <section className="container valuation-widget-section">
-        <div className="val-widget-card">
-          <div className="val-widget-inputs">
-            <span className="eyebrow">
-              <span className="eyebrow-line" /> INSTANT ESTIMATOR
-            </span>
-            <h3>Market Valuation Calculator</h3>
-
-            <div className="val-inputs-grid">
-              <div className="form-field">
-                <label>Locality &amp; Sector</label>
-                <select
-                  value={valLocality}
-                  onChange={(e) => setValLocality(e.target.value)}
-                >
-                  <option value="dha6">DHA Phase 6 (Prime Residential)</option>
-                  <option value="dha5">DHA Phase 5 (Commercial &amp; Living)</option>
-                  <option value="dha8">DHA Phase 8 (Coastline &amp; Extension)</option>
-                  <option value="clifton8">Clifton Block 8 (Seaview Luxury)</option>
-                  <option value="clifton2">Clifton Block 2 (Central)</option>
-                  <option value="bahria">Bahria Town Karachi (Precincts)</option>
-                  <option value="gulshan">Gulshan-e-Iqbal (Blocks 1-13)</option>
-                </select>
-              </div>
-
-              <div className="form-field">
-                <label>Property Category</label>
-                <select
-                  value={valType}
-                  onChange={(e) => setValType(e.target.value)}
-                >
-                  <option value="villa">Architect / Designer Villa</option>
-                  <option value="house">Standard Standalone House</option>
-                  <option value="apartment">Luxury Apartment Tower</option>
-                  <option value="plot">Residential Plot</option>
-                </select>
-              </div>
-
-              <div className="form-field">
-                <label>Plot / Covered Area ({valSize} Sq. Yd)</label>
-                <select
-                  value={valSize}
-                  onChange={(e) => setValSize(Number(e.target.value))}
-                >
-                  <option value={120}>120 Sq. Yards (Small Family / Townhouse)</option>
-                  <option value={250}>250 Sq. Yards (10 Marla / Medium)</option>
-                  <option value={350}>350 Sq. Yards (Bahria Standard)</option>
-                  <option value={500}>500 Sq. Yards (1 Kanal / DHA Standard)</option>
-                  <option value={1000}>1,000 Sq. Yards (2 Kanal Luxury Estate)</option>
-                  <option value={2000}>2,000 Sq. Yards (Flagship Compound)</option>
-                </select>
-              </div>
-
-              <div className="form-field">
-                <label>Age &amp; Finish Condition</label>
-                <select
-                  value={valCondition}
-                  onChange={(e) => setValCondition(e.target.value)}
-                >
-                  <option value="new">Brand New (2024-2026 / Turnkey)</option>
-                  <option value="mid">1 - 5 Years (Well Maintained)</option>
-                  <option value="older">10+ Years (Renovation Potential)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="val-widget-results">
-            <span className="res-tag">ESTIMATED MARKET BRACKET</span>
-            <div className="res-price-bracket">
-              <strong>{formatPrice(lowBracket)}</strong>
-              <span>to</span>
-              <strong>{formatPrice(highBracket)}</strong>
-            </div>
-            <p className="res-rate-note">
-              Average Rate: ~ PKR {Math.round(baseRate * typeMult).toLocaleString()} / sq. yd based on active registered transactions in this sector.
-            </p>
-
-            <div className="res-rental-yield-box">
-              <span>Potential Rental Yield:</span>
-              <strong>{formatPrice(estMonthlyRent, "rent")} / month</strong>
-            </div>
-
-            <button
-              type="button"
-              className="primary-button full-width"
-              onClick={handleValuationPrefill}
-            >
-              Request Certified Appraisal with this Estimate ↓
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Seller Consultation Form */}
-      <section id="seller-form" className="contact-layout container">
+      {/* Main Submit Section */}
+      <section className="container contact-layout" style={{ paddingTop: "40px", paddingBottom: "80px" }}>
         <div>
           <span className="eyebrow">
-            <span className="eyebrow-line" /> PERSONAL ADVISORY
+            <span className="eyebrow-line" /> PROPERTY OWNERS &amp; LANDLORDS
           </span>
           <h1>
-            Put your property<br />
-            <i>in the right hands.</i>
+            Want to Sell or Rent<br />
+            <i>Your Property?</i>
           </h1>
-          <p>
-            Whether selling an architectural villa or leasing a high-floor Clifton residence, our team pairs discreet representation with serious, qualified buyers.
+          <p style={{ fontSize: "15px", lineHeight: "1.7", color: "var(--muted)", marginTop: "18px" }}>
+            List your house, flat, plot, or commercial property with our team. We connect your listing directly with verified buyers and corporate tenants across Karachi.
           </p>
 
-          <div className="contact-points">
-            <span>01 <b>Accurate Comparative Market Analysis (CMA)</b></span>
-            <span>02 <b>High-Definition Architectural Photography &amp; Video</b></span>
-            <span>03 <b>Pre-screened High-Net-Worth Buyers &amp; Corporate Expats</b></span>
-            <span>04 <b>Complete Legal Documentation &amp; Transfer Support</b></span>
+          <div className="contact-points" style={{ marginTop: "35px" }}>
+            <span>01 <b>Direct WhatsApp Inquiry Routing</b></span>
+            <span>02 <b>Verified Buyers &amp; Corporate Expats</b></span>
+            <span>03 <b>Zero Clutter, Professional Presentation</b></span>
+            <span>04 <b>Complete Documentation &amp; Transfer Support</b></span>
           </div>
         </div>
 
-        {sent ? (
+        {submitted ? (
           <div className="form-card success-card">
-            <span className="note-icon">✦</span>
-            <h2>Thank You, We&apos;ll Be in Touch.</h2>
+            <span className="note-icon" style={{ fontSize: "32px" }}>✓</span>
+            <h2>Thank You!</h2>
             <p>
-              Your property brief has been assigned to our senior Karachi advisory desk. We will contact you via WhatsApp / Phone within one business day.
+              Your property brief has been submitted. Our property advisor will contact you shortly on WhatsApp (<strong>{phone}</strong>).
             </p>
-            <Link href="/" className="primary-button">
-              Return to Homepage
-            </Link>
+            <div style={{ marginTop: "20px", display: "flex", gap: "12px", justifyContent: "center" }}>
+              <button
+                type="button"
+                className="outline-button"
+                onClick={() => setSubmitted(false)}
+              >
+                Submit Another Property
+              </button>
+              <Link href="/" className="primary-button">
+                Return to Home
+              </Link>
+            </div>
           </div>
         ) : (
-          <form
-            className="form-card"
-            onSubmit={(event) => {
-              event.preventDefault();
-              setSent(true);
-            }}
-          >
-            <h3>Schedule Seller Consultation</h3>
+          <form className="form-card" onSubmit={handleSubmit}>
+            <h3 style={{ fontSize: "20px", margin: "0 0 10px" }}>Submit Your Property Details</h3>
 
-            <label htmlFor="name">Full Name</label>
+            <label htmlFor="owner-name">Your Full Name</label>
             <input
-              id="name"
+              id="owner-name"
               required
               placeholder="e.g. Tariq Mansoor"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
 
-            <label htmlFor="phone">Phone / WhatsApp Number</label>
+            <label htmlFor="owner-phone">WhatsApp Number</label>
             <input
-              id="phone"
+              id="owner-phone"
               required
-              placeholder="+92 300 0000000"
+              placeholder="+92 300 1234567"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
 
-            <label htmlFor="property">Property Brief &amp; Location</label>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginTop: "10px" }}>
+              <div>
+                <label htmlFor="prop-purpose">Purpose</label>
+                <select
+                  id="prop-purpose"
+                  value={purpose}
+                  onChange={(e) => setPurpose(e.target.value as "Sell" | "Rent")}
+                >
+                  <option value="Sell">Sell Property</option>
+                  <option value="Rent">Rent Out Property</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="prop-type">Property Type</label>
+                <select
+                  id="prop-type"
+                  value={propertyType}
+                  onChange={(e) => setPropertyType(e.target.value)}
+                >
+                  <option value="House">House / Portion</option>
+                  <option value="Apartment">Apartment / Flat</option>
+                  <option value="Villa">Villa / Bungalow</option>
+                  <option value="Plot">Residential Plot</option>
+                  <option value="Commercial">Commercial / Shop / Office</option>
+                </select>
+              </div>
+            </div>
+
+            <label htmlFor="prop-area">Location / Area</label>
             <input
-              id="property"
+              id="prop-area"
               required
-              placeholder="e.g. 500 Sq Yd Villa, DHA Phase 6"
-              value={locationStr}
-              onChange={(e) => setLocationStr(e.target.value)}
+              placeholder="e.g. Gulshan Block 13-D, DHA Phase 6, Jauhar Block 14"
+              value={areaLocation}
+              onChange={(e) => setAreaLocation(e.target.value)}
             />
 
-            <label htmlFor="intent">Primary Goal</label>
-            <select
-              id="intent"
-              value={intent}
-              onChange={(e) => setIntent(e.target.value)}
-            >
-              <option value="sell">Sell my property at highest market value</option>
-              <option value="rent">Find executive corporate tenants (Rent)</option>
-              <option value="value">Formal bank/legal property valuation</option>
-            </select>
+            <label htmlFor="prop-size">Plot / Covered Size (e.g. 120 Sq Yd / 3 Bed)</label>
+            <input
+              id="prop-size"
+              required
+              placeholder="e.g. 120 Sq Yd, 4 Bed, Double Storey"
+              value={sizeDetails}
+              onChange={(e) => setSizeDetails(e.target.value)}
+            />
 
-            <button className="primary-button" type="submit">
-              Request Advisory Consultation <span>↗</span>
+            <label htmlFor="prop-demand">Expected Demand / Rent (PKR)</label>
+            <input
+              id="prop-demand"
+              placeholder="e.g. PKR 2.40 Crore or PKR 65,000 / month"
+              value={demandPrice}
+              onChange={(e) => setDemandPrice(e.target.value)}
+            />
+
+            <label htmlFor="prop-notes">Additional Notes (Optional)</label>
+            <textarea
+              id="prop-notes"
+              rows={2}
+              placeholder="e.g. Corner plot, West open, sweet water line available"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              style={{ border: "0", borderBottom: "1px solid var(--line)", padding: "8px 0", outline: "0", fontSize: "13.5px", resize: "none" }}
+            />
+
+            <button className="primary-button" type="submit" style={{ marginTop: "16px", padding: "14px" }}>
+              💬 Submit Property to WhatsApp Advisor <span>→</span>
             </button>
           </form>
         )}
@@ -304,46 +209,30 @@ export default function ListPropertyPage() {
               <span>karachi<span>estate</span></span>
             </Link>
             <p>
-              Property with a point of view.<br />
-              Made for Karachi.
+              Professional Real Estate Website Solution.<br />
+              Built for Karachi Agencies.
             </p>
-            <div className="socials">
-              <a href="#instagram">ig</a>
-              <a href="#facebook">f</a>
-              <a href="#linkedin">in</a>
-            </div>
           </div>
           <div>
-            <h4>Explore</h4>
+            <h4>Properties</h4>
             <Link href="/properties?purpose=buy">Buy a property</Link>
             <Link href="/properties?purpose=rent">Rent a property</Link>
-            <Link href="/properties">All Neighbourhoods</Link>
-            <Link href="/list-property">List your property</Link>
+            <Link href="/properties">All Listings</Link>
           </div>
           <div>
-            <h4>Company</h4>
-            <Link href="/#about">About us</Link>
-            <Link href="/#services">Our services</Link>
-            <Link href="/#contact">Contact</Link>
+            <h4>Agency Solutions</h4>
+            <Link href="/#for-agencies">Get This Website</Link>
+            <Link href="/#for-agencies">WhatsApp Integration</Link>
           </div>
           <div>
-            <h4>Get in touch</h4>
-            <a href="tel:+9221111222333">021 111 222 333</a>
-            <a href="mailto:hello@karachiestate.pk">hello@karachiestate.pk</a>
-            <p className="footer-address">
-              Clifton, Karachi<br />
-              Mon–Sat, 9am–6pm
-            </p>
+            <h4>Contact Advisor</h4>
+            <a href="tel:+923008214590">+92 300 8214590</a>
+            <a href="mailto:contact@karachiestate.pk">contact@karachiestate.pk</a>
           </div>
         </div>
         <div className="container footer-bottom">
-          <span>© 2025 Karachi Estate. All rights reserved.</span>
-          <span>
-            <a href="#privacy">Privacy</a>
-            <a href="#terms">Terms</a>
-            <a href="#sitemap">Sitemap</a>
-          </span>
-          <span>Made with care in Karachi <b>♥</b></span>
+          <span>© 2025 Karachi Estate. Ready for Real Estate Agency Customization.</span>
+          <span>Made with care for Karachi Businesses <b>♥</b></span>
         </div>
       </footer>
     </main>

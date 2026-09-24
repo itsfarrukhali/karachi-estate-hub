@@ -54,7 +54,7 @@ export function PropertyCard({ property, onToggleFavorite, isFavorite }: Propert
   }
 
   const whatsappMessage = encodeURIComponent(
-    `Salam, I am interested in "${property.title}" (${property.price}) listed on Karachi Estate Hub. Please share more details: https://karachiestate.pk/properties/${property.id}`
+    `Assalam o Alaikum, I'm interested in the "${property.title}" in ${property.location.area} listed at ${property.price}. Please share more details.`
   );
 
   return (
@@ -161,19 +161,28 @@ export function PropertyCard({ property, onToggleFavorite, isFavorite }: Propert
 
         {/* Specs Grid */}
         <div className="prop-card-specs">
-          <div className="spec-item" title={`${property.bedrooms} Bedrooms`}>
-            <svg viewBox="0 0 24 24" className="spec-icon" aria-hidden="true">
-              <path d="M3 7v11m0-4h18m0-7v11M7 10h4a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2z" />
-            </svg>
-            <span><b>{property.bedrooms}</b> Beds</span>
-          </div>
+          {property.bedrooms > 0 ? (
+            <div className="spec-item" title={`${property.bedrooms} Bedrooms`}>
+              <svg viewBox="0 0 24 24" className="spec-icon" aria-hidden="true">
+                <path d="M3 7v11m0-4h18m0-7v11M7 10h4a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2z" />
+              </svg>
+              <span><b>{property.bedrooms}</b> Beds</span>
+            </div>
+          ) : (
+            <div className="spec-item" title={property.propertyType}>
+              <span className="spec-icon">📍</span>
+              <span><b>{property.propertyType}</b></span>
+            </div>
+          )}
 
-          <div className="spec-item" title={`${property.bathrooms} Bathrooms`}>
-            <svg viewBox="0 0 24 24" className="spec-icon" aria-hidden="true">
-              <path d="M4 12h16a1 1 0 0 1 1 1v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-3a1 1 0 0 1 1-1zm2-8h4a2 2 0 0 1 2 2v6H4V6a2 2 0 0 1 2-2z" />
-            </svg>
-            <span><b>{property.bathrooms}</b> Baths</span>
-          </div>
+          {property.bathrooms > 0 && (
+            <div className="spec-item" title={`${property.bathrooms} Bathrooms`}>
+              <svg viewBox="0 0 24 24" className="spec-icon" aria-hidden="true">
+                <path d="M4 12h16a1 1 0 0 1 1 1v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-3a1 1 0 0 1 1-1zm2-8h4a2 2 0 0 1 2 2v6H4V6a2 2 0 0 1 2-2z" />
+              </svg>
+              <span><b>{property.bathrooms}</b> Baths</span>
+            </div>
+          )}
 
           <div className="spec-item" title={`Area: ${property.area}`}>
             <svg viewBox="0 0 24 24" className="spec-icon" aria-hidden="true">
@@ -183,11 +192,11 @@ export function PropertyCard({ property, onToggleFavorite, isFavorite }: Propert
             <span><b>{formatArea(property.areaSqFt, property.area)}</b></span>
           </div>
 
-          <div className="spec-item" title={`${property.parkingSpaces} Car Parking`}>
+          <div className="spec-item" title={property.parkingSpaces > 0 ? `${property.parkingSpaces} Car Parking` : "Facing: " + (property.facing || "Open")}>
             <svg viewBox="0 0 24 24" className="spec-icon" aria-hidden="true">
               <path d="M5 17h14M7 17V8a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v9M9 17v2m6-2v2" />
             </svg>
-            <span><b>{property.parkingSpaces}</b> Cars</span>
+            <span><b>{property.parkingSpaces > 0 ? `${property.parkingSpaces} Cars` : (property.facing || "Open")}</b></span>
           </div>
         </div>
 

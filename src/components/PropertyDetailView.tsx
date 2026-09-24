@@ -91,7 +91,7 @@ export function PropertyDetailView({ property }: PropertyDetailViewProps) {
   }
 
   const whatsappMessage = encodeURIComponent(
-    `Salam ${property.agent.name}, I am inquiring about "${property.title}" (${property.price}) in ${property.location.area}, Karachi.`
+    `Assalam o Alaikum ${property.agent.name}, I am interested in the "${property.title}" in ${property.location.area} listed at ${property.price}. Please share more details.`
   );
 
   return (
@@ -99,7 +99,7 @@ export function PropertyDetailView({ property }: PropertyDetailViewProps) {
       {/* Top Bar Header with Currency & Unit Switcher */}
       <div className="topbar">
         <div className="container topbar-inner">
-          <span>Pakistan&apos;s trusted property partner</span>
+          <span>✨ Real Estate Agency Solutions · Karachi, PK</span>
           <div className="topbar-right-wrap">
             <CurrencyUnitSelector />
             <span className="topbar-right">Karachi, PK</span>
@@ -266,26 +266,40 @@ export function PropertyDetailView({ property }: PropertyDetailViewProps) {
         <div className="prop-left-col">
           {/* Key Specs Bar */}
           <div className="specs-card">
-            <div className="spec-tile">
-              <span className="spec-label">Bedrooms</span>
-              <strong className="spec-value">🛏️ {property.bedrooms} Beds</strong>
-            </div>
-            <div className="spec-tile">
-              <span className="spec-label">Bathrooms</span>
-              <strong className="spec-value">🚿 {property.bathrooms} Baths</strong>
-            </div>
+            {property.bedrooms > 0 ? (
+              <div className="spec-tile">
+                <span className="spec-label">Bedrooms</span>
+                <strong className="spec-value">🛏️ {property.bedrooms} Beds</strong>
+              </div>
+            ) : (
+              <div className="spec-tile">
+                <span className="spec-label">Category</span>
+                <strong className="spec-value">📍 {property.propertyType}</strong>
+              </div>
+            )}
+
+            {property.bathrooms > 0 && (
+              <div className="spec-tile">
+                <span className="spec-label">Bathrooms</span>
+                <strong className="spec-value">🚿 {property.bathrooms} Baths</strong>
+              </div>
+            )}
+
             <div className="spec-tile">
               <span className="spec-label">Covered Area</span>
               <strong className="spec-value">📐 {formatArea(property.areaSqFt, property.area)}</strong>
             </div>
+
             <div className="spec-tile">
-              <span className="spec-label">Parking</span>
-              <strong className="spec-value">🚗 {property.parkingSpaces} Cars</strong>
+              <span className="spec-label">{property.parkingSpaces > 0 ? "Parking" : "Orientation"}</span>
+              <strong className="spec-value">{property.parkingSpaces > 0 ? `🚗 ${property.parkingSpaces} Cars` : (property.facing || "Open")}</strong>
             </div>
+
             <div className="spec-tile">
-              <span className="spec-label">Year Built</span>
-              <strong className="spec-value">🏗️ {property.yearBuilt}</strong>
+              <span className="spec-label">Status</span>
+              <strong className="spec-value">🏗️ {property.yearBuilt ? `${property.yearBuilt}` : "Ready"}</strong>
             </div>
+
             <div className="spec-tile">
               <span className="spec-label">Furnishing</span>
               <strong className="spec-value">🛋️ {property.furnished}</strong>

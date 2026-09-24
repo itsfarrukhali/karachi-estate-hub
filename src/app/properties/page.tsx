@@ -12,6 +12,7 @@ function PropertiesCatalog() {
   const searchParams = useSearchParams();
   const initialPurpose = searchParams.get("purpose") || searchParams.get("mode") || "all";
   const initialArea = searchParams.get("area") || "";
+  const initialType = searchParams.get("type") || "all";
 
   const { savedIds, setIsDrawerOpen } = usePreferences();
 
@@ -19,7 +20,7 @@ function PropertiesCatalog() {
     initialPurpose === "rent" ? "rent" : initialPurpose === "buy" ? "buy" : "all"
   );
   const [searchTerm, setSearchTerm] = useState(initialArea);
-  const [typeFilter, setTypeFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState(initialType);
   const [bedsFilter, setBedsFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recommended");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -143,13 +144,13 @@ function PropertiesCatalog() {
           <i>worth living in.</i>
         </h1>
         <p className="catalog-hero-desc">
-          Browse verified residential villas, sea-view penthouses, and luxury apartments across Karachi’s most sought-after neighborhoods.
+          Explore houses, apartments, residential plots, and commercial properties across Karachi’s primary sectors.
         </p>
 
         {/* Quick Area Filter Pills */}
         <div className="quick-area-pills">
           <span className="pills-label">Popular Locations:</span>
-          {["DHA Phase 6", "Clifton", "Bahria Town", "Gulshan-e-Iqbal", "DHA Phase 8"].map((area) => (
+          {["Gulshan", "DHA", "Jauhar", "North Nazimabad", "Scheme 33", "PECHS", "Clifton", "Bahria Town"].map((area) => (
             <button
               key={area}
               type="button"
@@ -198,7 +199,7 @@ function PropertiesCatalog() {
             </svg>
             <input
               type="text"
-              placeholder="Search DHA, Clifton, Bahria..."
+              placeholder="Search Gulshan, DHA, Jauhar, Scheme 33..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -221,11 +222,11 @@ function PropertiesCatalog() {
               aria-label="Property type"
             >
               <option value="all">All Property Types</option>
-              <option value="villa">Villas</option>
-              <option value="house">Houses</option>
-              <option value="apartment">Apartments</option>
-              <option value="penthouse">Penthouses</option>
-              <option value="townhouse">Townhouses</option>
+              <option value="house">Houses &amp; Portions</option>
+              <option value="apartment">Apartments &amp; Flats</option>
+              <option value="villa">Villas &amp; Bungalows</option>
+              <option value="plot">Residential Plots</option>
+              <option value="commercial">Commercial &amp; Shops</option>
             </select>
           </div>
 
@@ -237,6 +238,7 @@ function PropertiesCatalog() {
               aria-label="Minimum bedrooms"
             >
               <option value="all">Any Bedrooms</option>
+              <option value="2">2+ Bedrooms</option>
               <option value="3">3+ Bedrooms</option>
               <option value="4">4+ Bedrooms</option>
               <option value="5">5+ Bedrooms</option>
